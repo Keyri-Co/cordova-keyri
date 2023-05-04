@@ -1,0 +1,29 @@
+{
+  "name": "cordova-keyri",
+  "version": "0.0.1",
+  "description": "Cordova Keyri SDK Plugin",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-android"
+  ],
+  "author": "Andrii Kuliahin",
+  "license": "MIT",
+  "engines": {
+    "cordovaDependencies": {
+      "1.0.0": {
+        "cordova": ">=11.0.0",
+        "cordova-android": ">=10.1.1"
+      }
+    }
+  },
+  "cordova": {
+    "id": "cordova-keyri",
+    "platforms": [
+      "android"
+    ]
+  }
+}
