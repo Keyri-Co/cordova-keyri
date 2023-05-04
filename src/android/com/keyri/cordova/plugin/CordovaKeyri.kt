@@ -15,7 +15,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class CordovaKeyri : CordovaPlugin {
+class CordovaKeyri : CordovaPlugin() {
 
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
@@ -120,13 +120,19 @@ class CordovaKeyri : CordovaPlugin {
         blockEmulatorDetection: Boolean,
         callback: CallbackContext
     ) {
-        if (appKey == null) {
-            callback.error("initialize, appKey must not be null")
-        } else {
-            this.cordova.getActivity()?.let {
-                keyri = Keyri(it, appKey, publicApiKey, blockEmulatorDetection)
+        cordova.threadPool.execute {
+            try {
+                if (appKey == null) {
+                    callback.error("initialize, appKey must not be null")
+                } else {
+                    cordova.getActivity()?.let {
+                        keyri = Keyri(it, appKey, publicApiKey, blockEmulatorDetection)
 
-                callback.success()
+                        callback.success()
+                    }
+                }
+            } catch (e: Exception) {
+                callback.error(e.message)
             }
         }
     }
@@ -268,7 +274,7 @@ class CordovaKeyri : CordovaPlugin {
             } else if (payload == null) {
                 callback.error("initializeDefaultScreen, payload must not be null")
             } else {
-                (this.cordova.getActivity() as? FragmentActivity)?.supportFragmentManager?.let { fm ->
+                (cordova.getActivity() as? FragmentActivity)?.supportFragmentManager?.let { fm ->
                     keyri.initializeDefaultConfirmationScreen(fm, session, payload).onSuccess { authResult ->
                         callback.success(authResult)
                     }.onFailure {
@@ -286,7 +292,7 @@ class CordovaKeyri : CordovaPlugin {
             } else if (payload == null) {
                 callback.error("processLink, payload must not be null")
             } else {
-                (this.cordova.getActivity() as? FragmentActivity)?.supportFragmentManager?.let { fm ->
+                (cordova.getActivity() as? FragmentActivity)?.supportFragmentManager?.let { fm ->
                     keyri.processLink(fm, Uri.parse(link), payload, publicUserId).onSuccess { authResult ->
                         callback.success(authResult)
                     }.onFailure {
@@ -306,7 +312,7 @@ class CordovaKeyri : CordovaPlugin {
             } else if (payload == null) {
                 callback.error("confirmSession, payload must not be null")
             } else {
-                session.confirm(payload, requireNotNull(this.cordova.getActivity())).onSuccess {
+                session.confirm(payload, requireNotNull(cordova.getActivity())).onSuccess {
                     callback.success()
                 }.onFailure {
                     callback.error("confirmSession, ${it.message}")
@@ -324,7 +330,7 @@ class CordovaKeyri : CordovaPlugin {
             } else if (payload == null) {
                 callback.error("denySession, payload must not be null")
             } else {
-                session.deny(payload, requireNotNull(this.cordova.getActivity())).onSuccess {
+                session.deny(payload, requireNotNull(cordova.getActivity())).onSuccess {
                     callback.success()
                 }.onFailure {
                     callback.error("denySession, ${it.message}")
@@ -334,8 +340,4 @@ class CordovaKeyri : CordovaPlugin {
     }
 
     private fun findSession(sessionId: String?): Session? = sessions.firstOrNull { it.sessionId == sessionId }
-
-    companion object {
-        private const val AUTH_REQUEST_CODE = 2133
-    }
 }
