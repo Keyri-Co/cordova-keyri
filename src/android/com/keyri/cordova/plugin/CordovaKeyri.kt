@@ -1,16 +1,19 @@
 package com.keyri.cordova.plugin
 
-import com.keyrico.keyrisdk.Keyri
 import android.net.Uri
-import com.google.gson.Gson
+import android.app.Activity
+import android.content.Intent
+import androidx.fragment.app.FragmentActivity
+import com.keyrico.keyrisdk.Keyri
+import com.keyrico.scanner.easyKeyriAuth
+import com.keyrico.keyrisdk.entity.session.Session
 import com.keyrico.keyrisdk.sec.fingerprint.enums.EventType
 import com.keyrico.keyrisdk.sec.fingerprint.enums.FingerprintLogResult
+import com.google.gson.Gson
 import org.apache.cordova.CallbackContext
 import org.apache.cordova.CordovaPlugin
 import org.json.JSONArray
 import org.json.JSONObject
-import androidx.fragment.app.FragmentActivity
-import com.keyrico.keyrisdk.entity.session.Session
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -23,7 +26,7 @@ class CordovaKeyri : CordovaPlugin() {
 
     private lateinit var keyri: Keyri
 
-    private val easyKeyriAuthCallback: CallbackContext? = null
+    private var easyKeyriAuthCallback: CallbackContext? = null
 
     override fun execute(action: String, arguments: JSONArray?, callbackContext: CallbackContext): Boolean {
         when (action) {
