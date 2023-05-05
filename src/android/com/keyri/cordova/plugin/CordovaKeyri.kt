@@ -19,9 +19,11 @@ class CordovaKeyri : CordovaPlugin() {
 
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
+    private val sessions = mutableListOf<Session>()
+
     private lateinit var keyri: Keyri
 
-    private val sessions = mutableListOf<Session>()
+    private val easyKeyriAuthCallback: CallbackContext? = null
 
     override fun execute(action: String, arguments: JSONArray?, callbackContext: CallbackContext): Boolean {
         when (action) {
@@ -31,6 +33,15 @@ class CordovaKeyri : CordovaPlugin() {
                 val blockEmulatorDetection = arguments?.getBoolean(2)
 
                 initialize(appKey, publicApiKey, blockEmulatorDetection ?: true, callbackContext)
+            }
+
+            "easyKeyriAuth" -> {
+                val appKey = arguments?.getString(0)
+                val publicApiKey = arguments?.getString(1)
+                val payload = arguments?.getString(2)
+                val publicUserId = arguments?.getString(3)
+
+                easyKeyriAuth(appKey, publicApiKey, payload, publicUserId, callbackContext)
             }
 
             "generateAssociationKey" -> {
@@ -126,7 +137,9 @@ class CordovaKeyri : CordovaPlugin() {
                     callback.error("initialize, appKey must not be null")
                 } else {
                     cordova.getActivity()?.let {
-                        keyri = Keyri(it, appKey, publicApiKey, blockEmulatorDetection)
+                        if (!this::keyri.isInitialized) {
+                            keyri = Keyri(it, appKey, publicApiKey, blockEmulatorDetection)
+                        }
 
                         callback.success()
                     }
@@ -134,6 +147,33 @@ class CordovaKeyri : CordovaPlugin() {
             } catch (e: Exception) {
                 callback.error(e.message)
             }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == AUTH_REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                easyKeyriAuthCallback?.success()
+            }
+        }
+    }
+
+    private fun easyKeyriAuth(
+        appKey: String?,
+        publicApiKey: String?,
+        payload: String?,
+        publicUserId: String?,
+        callback: CallbackContext
+    ) {
+        if (appKey == null || payload == null) {
+            callback.error("easyKeyriAuth, appKey and payload must not be null")
+        } else {
+            cordova.getActivity()?.let {
+                cordova.setActivityResultCallback(this)
+                easyKeyriAuth(it, AUTH_REQUEST_CODE, appKey, publicApiKey, payload, publicUserId)
+
+                easyKeyriAuthCallback = callback
+            } ?: callback.error("initializeDefaultScreen, can't get cordova.getActivity()")
         }
     }
 
@@ -340,4 +380,8 @@ class CordovaKeyri : CordovaPlugin() {
     }
 
     private fun findSession(sessionId: String?): Session? = sessions.firstOrNull { it.sessionId == sessionId }
+
+    companion object {
+        private const val AUTH_REQUEST_CODE = 2133
+    }
 }

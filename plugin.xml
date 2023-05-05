@@ -8,7 +8,7 @@
     <license>MIT</license>
 
     <js-module src="www/CordovaKeyri.js" name="CordovaKeyri">
-        <clobbers target="cordova.plugins.CordovaKeyri" />
+        <clobbers target="cordova.plugins.CordovaKeyri"/>
     </js-module>
 
     <engines>
@@ -18,9 +18,9 @@
 
     <platform name="android">
         <framework src="com.keyri:keyrisdk:3.0.3"/>
+        <framework src="com.keyri:scanner:3.0.4"/>
         <framework src="com.google.code.gson:gson:2.9.0"/>
         <framework src="org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.20"/>
-        <framework src="org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4"/>
 
         <source-file src="src/android/com/keyri/cordova/plugin/CordovaKeyri.kt"
                      target-dir="java/org/apache/cordova/plugin/echo/"/>
