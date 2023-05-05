@@ -33,4 +33,13 @@
             </feature>
         </config-file>
     </platform>
+    <platform name="ios">
+        <config-file target="config.xml" parent="/*">
+            <feature name="CordovaKeyri">
+                <param name="ios-package" value="CordovaKeyri"/>
+            </feature>
+        </config-file>
+        <source-file src="src/ios/com/keyri/cordova/plugin/CordovaKeyri.swift"/>
+        <dependency id="cordova-plugin-add-swift-support" version="2.0.2"/>
+    </platform>
 </plugin>
