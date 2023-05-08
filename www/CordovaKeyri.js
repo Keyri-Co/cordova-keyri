@@ -13,6 +13,7 @@ exports.getUserSignature = function (publicUserId, customSignedData, success, er
 };
 
 exports.listAssociationKey = function (success, error) {
+    alert("called in module");
     exec(success, error, 'CordovaKeyri', 'listAssociationKey', []);
 };
 
