@@ -1,27 +1,32 @@
 package com.keyri.cordova.plugin
 
-import com.keyrico.keyrisdk.Keyri
 import android.net.Uri
-import com.google.gson.Gson
+import android.app.Activity
+import android.content.Intent
+import androidx.fragment.app.FragmentActivity
+import com.keyrico.keyrisdk.Keyri
+import com.keyrico.scanner.easyKeyriAuth
+import com.keyrico.keyrisdk.entity.session.Session
 import com.keyrico.keyrisdk.sec.fingerprint.enums.EventType
 import com.keyrico.keyrisdk.sec.fingerprint.enums.FingerprintLogResult
+import com.google.gson.Gson
 import org.apache.cordova.CallbackContext
 import org.apache.cordova.CordovaPlugin
 import org.json.JSONArray
 import org.json.JSONObject
-import androidx.fragment.app.FragmentActivity
-import com.keyrico.keyrisdk.entity.session.Session
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class CordovaKeyri : CordovaPlugin {
+class CordovaKeyri : CordovaPlugin() {
 
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
+    private val sessions = mutableListOf<Session>()
+
     private lateinit var keyri: Keyri
 
-    private val sessions = mutableListOf<Session>()
+    private var easyKeyriAuthCallback: CallbackContext? = null
 
     override fun execute(action: String, arguments: JSONArray?, callbackContext: CallbackContext): Boolean {
         when (action) {
@@ -31,6 +36,15 @@ class CordovaKeyri : CordovaPlugin {
                 val blockEmulatorDetection = arguments?.getBoolean(2)
 
                 initialize(appKey, publicApiKey, blockEmulatorDetection ?: true, callbackContext)
+            }
+
+            "easyKeyriAuth" -> {
+                val appKey = arguments?.getString(0)
+                val publicApiKey = arguments?.getString(1)
+                val payload = arguments?.getString(2)
+                val publicUserId = arguments?.getString(3)
+
+                easyKeyriAuth(appKey, publicApiKey, payload, publicUserId, callbackContext)
             }
 
             "generateAssociationKey" -> {
@@ -120,14 +134,49 @@ class CordovaKeyri : CordovaPlugin {
         blockEmulatorDetection: Boolean,
         callback: CallbackContext
     ) {
-        if (appKey == null) {
-            callback.error("initialize, appKey must not be null")
-        } else {
-            this.cordova.getActivity()?.let {
-                keyri = Keyri(it, appKey, publicApiKey, blockEmulatorDetection)
+        cordova.threadPool.execute {
+            try {
+                if (appKey == null) {
+                    callback.error("initialize, appKey must not be null")
+                } else {
+                    cordova.getActivity()?.let {
+                        if (!this::keyri.isInitialized) {
+                            keyri = Keyri(it, appKey, publicApiKey, blockEmulatorDetection)
+                        }
 
-                callback.success()
+                        callback.success()
+                    }
+                }
+            } catch (e: Exception) {
+                callback.error(e.message)
             }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == AUTH_REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                easyKeyriAuthCallback?.success()
+            }
+        }
+    }
+
+    private fun easyKeyriAuth(
+        appKey: String?,
+        publicApiKey: String?,
+        payload: String?,
+        publicUserId: String?,
+        callback: CallbackContext
+    ) {
+        if (appKey == null || payload == null) {
+            callback.error("easyKeyriAuth, appKey and payload must not be null")
+        } else {
+            cordova.getActivity()?.let {
+                cordova.setActivityResultCallback(this)
+                easyKeyriAuth(it, AUTH_REQUEST_CODE, appKey, publicApiKey, payload, publicUserId)
+
+                easyKeyriAuthCallback = callback
+            } ?: callback.error("initializeDefaultScreen, can't get cordova.getActivity()")
         }
     }
 
@@ -268,7 +317,7 @@ class CordovaKeyri : CordovaPlugin {
             } else if (payload == null) {
                 callback.error("initializeDefaultScreen, payload must not be null")
             } else {
-                (this.cordova.getActivity() as? FragmentActivity)?.supportFragmentManager?.let { fm ->
+                (cordova.getActivity() as? FragmentActivity)?.supportFragmentManager?.let { fm ->
                     keyri.initializeDefaultConfirmationScreen(fm, session, payload).onSuccess { authResult ->
                         callback.success(authResult)
                     }.onFailure {
@@ -286,7 +335,7 @@ class CordovaKeyri : CordovaPlugin {
             } else if (payload == null) {
                 callback.error("processLink, payload must not be null")
             } else {
-                (this.cordova.getActivity() as? FragmentActivity)?.supportFragmentManager?.let { fm ->
+                (cordova.getActivity() as? FragmentActivity)?.supportFragmentManager?.let { fm ->
                     keyri.processLink(fm, Uri.parse(link), payload, publicUserId).onSuccess { authResult ->
                         callback.success(authResult)
                     }.onFailure {
@@ -306,7 +355,7 @@ class CordovaKeyri : CordovaPlugin {
             } else if (payload == null) {
                 callback.error("confirmSession, payload must not be null")
             } else {
-                session.confirm(payload, requireNotNull(this.cordova.getActivity())).onSuccess {
+                session.confirm(payload, requireNotNull(cordova.getActivity())).onSuccess {
                     callback.success()
                 }.onFailure {
                     callback.error("confirmSession, ${it.message}")
@@ -324,7 +373,7 @@ class CordovaKeyri : CordovaPlugin {
             } else if (payload == null) {
                 callback.error("denySession, payload must not be null")
             } else {
-                session.deny(payload, requireNotNull(this.cordova.getActivity())).onSuccess {
+                session.deny(payload, requireNotNull(cordova.getActivity())).onSuccess {
                     callback.success()
                 }.onFailure {
                     callback.error("denySession, ${it.message}")

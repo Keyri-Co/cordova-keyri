@@ -4,6 +4,10 @@ exports.initialize = function (appKey, publicApiKey, blockEmulatorDetection, suc
     exec(success, error, 'CordovaKeyri', 'initialize', [appKey, publicApiKey, blockEmulatorDetection]);
 };
 
+exports.easyKeyriAuth = function (appKey, publicApiKey, payload, publicUserId, success, error) {
+    exec(success, error, 'CordovaKeyri', 'easyKeyriAuth', [appKey, publicApiKey, payload, publicUserId]);
+};
+
 exports.generateAssociationKey = function (publicUserId, success, error) {
     exec(success, error, 'CordovaKeyri', 'generateAssociationKey', [publicUserId]);
 };
