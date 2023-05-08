@@ -1,45 +1,57 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        id="cordova-keyri" version="0.0.2">
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  id="cordova-keyri" version="0.0.2">
 
-    <name>Cordova Keyri</name>
-    <description>Cordova Keyri SDK Plugin</description>
-    <license>MIT</license>
+  <name>CordovaKeyri</name>
+  <description>Cordova Keyri SDK Plugin</description>
 
-    <js-module src="www/CordovaKeyri.js" name="CordovaKeyri">
-        <clobbers target="cordova.plugins.CordovaKeyri"/>
-    </js-module>
+  <license>MIT</license>
 
-    <engines>
-        <engine name="cordova" version=">=10.0.0"/>
-        <engine name="cordova-android" version=">=9.0.0"/>
-    </engines>
+  <engines>
+    <engine name="cordova" version=">=10.0.0"/>
+    <engine name="cordova-android" version=">=9.0.0"/>
+  </engines>
+  
+  <js-module src="www/CordovaKeyri.js" name="CordovaKeyri">
+      <clobbers target="cordova.plugins.CordovaKeyri"/>
+  </js-module>
 
-    <platform name="android">
-        <framework src="com.keyri:keyrisdk:3.0.5"/>
-        <framework src="com.keyri:scanner:3.0.5"/>
-        <framework src="com.google.code.gson:gson:2.9.0"/>
-        <framework src="org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.20"/>
+  <platform name="android">
+      <framework src="com.keyri:keyrisdk:3.0.5"/>
+      <framework src="com.keyri:scanner:3.0.5"/>
+      <framework src="com.google.code.gson:gson:2.9.0"/>
+      <framework src="org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.20"/>
 
-        <source-file src="src/android/com/keyri/cordova/plugin/CordovaKeyri.kt"
-                     target-dir="java/org/apache/cordova/plugin/echo/"/>
+    <source-file src="src/android/com/keyri/cordova/plugin/CordovaKeyri.kt" target-dir="java/org/apache/cordova/plugin/echo/"/>
 
+    <config-file target="config.xml" parent="/*">
+      <preference name="GradlePluginKotlinEnabled" value="true" />
+        
+      <feature name="CordovaKeyri">
+        <param name="android-package" value="com.keyri.cordova.plugin.CordovaKeyri"/>
+      </feature>
+    </config-file>
+  </platform>
+  
+  <platform name="ios">
         <config-file target="config.xml" parent="/*">
-            <preference name="GradlePluginKotlinEnabled" value="true"/>
-
             <feature name="CordovaKeyri">
-                <param name="android-package" value="com.keyri.cordova.plugin.CordovaKeyri"/>
+              <param name="ios-package" value="CordovaKeyri"/>
             </feature>
         </config-file>
-    </platform>
-    <platform name="ios">
-        <config-file target="config.xml" parent="/*">
-            <feature name="CordovaKeyri">
-                <param name="ios-package" value="CordovaKeyri"/>
-            </feature>
-        </config-file>
-        <source-file src="src/ios/com/keyri/cordova/plugin/CordovaKeyri.swift"/>
+        
+        <source-file src="src/ios/com/keyri/cordova/plugin/CordovaKeyri.swift" />
         <dependency id="cordova-plugin-add-swift-support" version="2.0.2"/>
-    </platform>
+        
+        <podspec>
+             <config>
+                 <source url="https://github.com/CocoaPods/Specs.git"/>
+             </config>
+             <pods use-frameworks="true">
+                 <pod name="keyri-pod" spec="~> 3.0.1" />
+             </pods>
+        </podspec>
+  </platform>
+  
 </plugin>

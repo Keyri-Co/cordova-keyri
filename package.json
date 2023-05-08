@@ -8,7 +8,10 @@
   },
   "keywords": [
     "ecosystem:cordova",
-    "cordova-android"
+    "cordova-android",
+    "cordova",
+    "camera",
+    "cordova-ios"
   ],
   "author": "Andrii Kuliahin",
   "license": "MIT",
@@ -23,6 +26,7 @@
   "cordova": {
     "id": "cordova-keyri",
     "platforms": [
+      "ios",
       "android"
     ]
   }
