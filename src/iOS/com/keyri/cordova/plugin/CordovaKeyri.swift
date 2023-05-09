@@ -4,8 +4,8 @@ import keyri_pod
 @objc(CordovaKeyri) class CordovaKeyri : CDVPlugin {
     var keyri: Keyri?
     
-    @objc(initializeKeyri:)
-    func initializeKeyri(command: CDVInvokedUrlCommand) {
+    @objc(initialize:)
+    func initialize(command: CDVInvokedUrlCommand) {
         guard let appKey = command.arguments[0] as? String else {
             let error = "No app key provided"
             let pluginResult = CDVPluginResult(status: CDVCommandStatus_ERROR, messageAs: error)
