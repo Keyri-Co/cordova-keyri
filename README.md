@@ -3,17 +3,17 @@
 *   iOS 14+, Swift 5.3
 *   Android API level 23 or higher, AndroidX, Kotlin coroutines compatability
 
-
-For detailed documentation on how to set up Deeplinking
-
-
 ## **Interacting with the Plugin**
 
+Please see the examples below as well as a full set of method examples here: https://github.com/Keyri-Co/sample-cordova-app/blob/main/keyriSample/www/js/index.js
 
 ### Initialize Keyri
-To initialize the object, simply call the initialize method, and pass in your app key and api key, generated in the Keyri dashboard
+To initialize the Keyri object, simply call the initialize method, and pass in your app key and api key, generated in the Keyri dashboard
 ```JS
 let Keyri;
+let appKey = 'your_app_key'
+let publicApiKey = 'your_api_key'
+
 Keyri.initialize(appKey, publicApiKey, true, (message) => {
     console.log('CordovaKeyri.initialize', message);
 }, (e) => {
@@ -43,11 +43,11 @@ To look up an existing user's key:
 ```
 
 ### Enable QR Auth
-QR Auth can be enabled with a single function call. This process handles scanning the code, generating the session info, displaying a confirmation screen to the user, and, should the user confirm, sending the encrypted payload the developer provides to the Keyri widget in your browser.
+QR Auth can be enabled with a single function call. This process handles scanning the code, generating the session info, displaying a confirmation screen to the user, and, if the user confirms, sending the encrypted payload you provide to the Keyri widget in your browser.
 ```JS
-  Keyri.easyKeyriAuth(appKey, publicAppKey, 'Payload', 'kulagin.andrew38@gmail.com', () => {
+  Keyri.easyKeyriAuth(appKey, publicAppKey, 'Some Payload', 'kulahin.andrew@gmail.com', () => {
       console.log('CordovaKeyri.easyKeyriAuth', 'ok');
-      alert('Authorized');
+      alert('Payload sent');
   }, (e) => {
       console.log('CordovaKeyri.easyKeyriAuth', e);
   })
@@ -66,8 +66,7 @@ The association keys can be used to sign data to send to a remote server. If the
 
 ## License
 
-This library is available under paid and free licenses. See the [LICENSE](LICENSE.txt) file for the
-full license text.
+This library is available under paid and free licenses.
 
 * Details of licensing (pricing, etc) are available
   at [https://keyri.com/pricing](https://keyri.com/pricing), or you can contact us
@@ -92,5 +91,3 @@ What's not allowed under the license:
 ### Disclaimer
 
 We care deeply about the quality of our product and rigorously test every piece of functionality we offer. That said, every integration is different. Every app on the App Store has a different permutation of build settings, compiler flags, processor requirements, compatability issues etc and it's impossible for us to cover all of those bases, so we strongly recommend thourough testing of your integration before shipping to production. Please feel free to file a bug or issue if you notice anything that seems wrong or weird on GitHub 🙂
-
-<https://github.com/Keyri-Co/keyri-ios-whitelabel-sdk/issues>
