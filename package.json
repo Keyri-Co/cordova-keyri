@@ -1,6 +1,6 @@
 {
-  "name": "cordova-keyri",
-  "version": "0.0.1",
+  "name": "@keyri/cordova-keyri",
+  "version": "0.0.4",
   "description": "Cordova Keyri SDK Plugin",
   "main": "index.js",
   "scripts": {
@@ -13,6 +13,10 @@
     "camera",
     "cordova-ios"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Keyri-Co/cordova-keyri"
+  },
   "author": "Andrii Kuliahin",
   "license": "MIT",
   "engines": {
@@ -24,7 +28,7 @@
     }
   },
   "cordova": {
-    "id": "cordova-keyri",
+    "id": "@keyri/cordova-keyri",
     "platforms": [
       "ios",
       "android"
