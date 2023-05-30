@@ -1,6 +1,6 @@
 {
   "name": "@keyri/cordova-keyri",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Cordova Keyri SDK Plugin",
   "main": "index.js",
   "scripts": {
