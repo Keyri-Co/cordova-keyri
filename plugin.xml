@@ -2,7 +2,7 @@
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
         xmlns:android="http://schemas.android.com/apk/res/android"
         id="cordova-keyri"
-        version="0.0.8">
+        version="0.0.9">
 
     <name>CordovaKeyri</name>
     <description>Cordova Keyri SDK Plugin</description>
@@ -32,7 +32,6 @@
 
         <config-file target="config.xml" parent="/*">
             <preference name="android-minSdkVersion" value="23"/>
-            <preference name="android-targetSdkVersion" value="31"/>
 
             <preference name="GradlePluginKotlinEnabled" value="true"/>
             <preference name="GradlePluginKotlinVersion" value="1.6.0"/>
