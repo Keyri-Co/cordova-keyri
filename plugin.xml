@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-        xmlns:android="http://schemas.android.com/apk/res/android"
         id="cordova-keyri"
-        version="0.0.10">
+        version="0.0.11">
 
     <name>CordovaKeyri</name>
     <description>Cordova Keyri SDK Plugin</description>
@@ -24,7 +23,7 @@
         <framework src="com.google.code.gson:gson:2.9.0"/>
 
         <source-file src="src/android/com/keyri/cordova/plugin/CordovaKeyri.kt"
-                     target-dir="src/com/keyri/cordova/plugin"/>
+                     target-dir="java/org/apache/cordova/plugin/"/>
 
         <config-file target="config.xml" parent="/*">
             <preference name="GradlePluginKotlinEnabled" value="true"/>
