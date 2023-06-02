@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        xmlns:android="http://schemas.android.com/apk/res/android"
         id="cordova-keyri"
-        version="0.0.11">
+        version="0.0.12">
 
     <name>CordovaKeyri</name>
     <description>Cordova Keyri SDK Plugin</description>
@@ -9,7 +10,7 @@
     <license>MIT</license>
 
     <engines>
-        <engine name="cordova" version=">=9.0.1"/>
+        <engine name="cordova" version=">=10.0.0"/>
         <engine name="cordova-android" version=">=9.0.0"/>
     </engines>
 
@@ -25,9 +26,16 @@
         <source-file src="src/android/com/keyri/cordova/plugin/CordovaKeyri.kt"
                      target-dir="java/org/apache/cordova/plugin/"/>
 
+        <config-file target="AndroidManifest.xml" parent="/*">
+            <uses-permission android:name="android.permission.INTERNET"/>
+        </config-file>
+
         <config-file target="config.xml" parent="/*">
+            <preference name="android-minSdkVersion" value="23"/>
+            <preference name="android-targetSdkVersion" value="31"/>
+
             <preference name="GradlePluginKotlinEnabled" value="true"/>
-            <preference name="GradlePluginKotlinVersion" value="1.6.0"/>
+            <preference name="GradlePluginKotlinVersion" value="1.7.21"/>
 
             <feature name="CordovaKeyri">
                 <param name="android-package" value="com.keyri.cordova.plugin.CordovaKeyri"/>
