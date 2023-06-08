@@ -1,62 +1,64 @@
 var exec = require('cordova/exec');
 
-exports.initialize = function (appKey, publicApiKey, blockEmulatorDetection, success, error) {
-    exec(success, error, 'CordovaKeyri', 'initialize', [appKey, publicApiKey, blockEmulatorDetection]);
-};
+const asPromise = (action, args = []) =>
+    new Promise((resolve, reject) => {
+        exec(resolve, reject, 'CordovaKeyri', action, args);
+    });
 
-exports.isInitialized = function (success, error) {
-    exec(success, error, 'CordovaKeyri', 'isInitialized', []);
-};
+const initialize = (appKey, publicApiKey, blockEmulatorDetection) =>
+    asPromise('initialize', [appKey, publicApiKey, blockEmulatorDetection]);
 
-exports.easyKeyriAuth = function (appKey, publicApiKey, payload, publicUserId, success, error) {
-    exec(success, error, 'CordovaKeyri', 'easyKeyriAuth', [appKey, publicApiKey, payload, publicUserId]);
-};
+const isInitialized = () => asPromise('isInitialized');
 
-exports.generateAssociationKey = function (publicUserId, success, error) {
-    exec(success, error, 'CordovaKeyri', 'generateAssociationKey', [publicUserId]);
-};
+const easyKeyriAuth = (appKey, publicApiKey, payload, publicUserId) =>
+    asPromise('easyKeyriAuth', [appKey, publicApiKey, payload, publicUserId]);
 
-exports.getUserSignature = function (publicUserId, customSignedData, success, error) {
-    exec(success, error, 'CordovaKeyri', 'getUserSignature', [publicUserId, customSignedData]);
-};
+const generateAssociationKey = (publicUserId) => asPromise('generateAssociationKey', [publicUserId]);
 
-exports.listAssociationKey = function (success, error) {
-    alert("called in module");
-    exec(success, error, 'CordovaKeyri', 'listAssociationKey', []);
-};
+const getUserSignature = (publicUserId, customSignedData) =>
+    asPromise('getUserSignature', [publicUserId, customSignedData]);
 
-exports.listUniqueAccounts = function (success, error) {
-    exec(success, error, 'CordovaKeyri', 'listUniqueAccounts', []);
-};
+const listAssociationKey = () => asPromise('listAssociationKey');
 
-exports.getAssociationKey = function (publicUserId, success, error) {
-    exec(success, error, 'CordovaKeyri', 'getAssociationKey', [publicUserId]);
-};
+const listUniqueAccounts = () => asPromise('listUniqueAccounts');
 
-exports.removeAssociationKey = function (publicUserId, success, error) {
-    exec(success, error, 'CordovaKeyri', 'removeAssociationKey', [publicUserId]);
-};
+const getAssociationKey = (publicUserId) => asPromise('getAssociationKey', [publicUserId]);
 
-exports.sendEvent = function (publicUserId, eventType, eventResult, success, error) {
-    exec(success, error, 'CordovaKeyri', 'sendEvent', [publicUserId, eventType, eventResult]);
-};
+const removeAssociationKey = (publicUserId) => asPromise('removeAssociationKey', [publicUserId]);
 
-exports.initiateQrSession = function (sessionId, publicUserId, success, error) {
-    exec(success, error, 'CordovaKeyri', 'initiateQrSession', [sessionId, publicUserId]);
-};
+const sendEvent = (publicUserId, eventType, eventResult) =>
+    asPromise('sendEvent', [publicUserId, eventType, eventResult]);
 
-exports.initializeDefaultScreen = function (sessionId, payload, success, error) {
-    exec(success, error, 'CordovaKeyri', 'initializeDefaultScreen', [sessionId, payload]);
-};
+const initiateQrSession = (sessionId, publicUserId) =>
+    asPromise('initiateQrSession', [sessionId, publicUserId]);
 
-exports.confirmSession = function (sessionId, payload, success, error) {
-    exec(success, error, 'CordovaKeyri', 'confirmSession', [sessionId, payload]);
-};
+const initializeDefaultScreen = (sessionId, payload) =>
+    asPromise('initializeDefaultScreen', [sessionId, payload]);
 
-exports.denySession = function (sessionId, payload, success, error) {
-    exec(success, error, 'CordovaKeyri', 'denySession', [sessionId, payload]);
-};
+const confirmSession = (sessionId, payload) =>
+    asPromise('confirmSession', [sessionId, payload]);
 
-exports.processLink = function (url, payload, publicUserId, success, error) {
-    exec(success, error, 'CordovaKeyri', 'processLink', [url, payload, publicUserId]);
+const denySession = (sessionId, payload) =>
+    asPromise('denySession', [sessionId, payload]);
+
+const processLink = (url, payload, publicUserId) =>
+    asPromise('processLink', [url, payload, publicUserId]);
+
+// Export all methods in one block
+module.exports = {
+    initialize,
+    isInitialized,
+    easyKeyriAuth,
+    generateAssociationKey,
+    getUserSignature,
+    listAssociationKey,
+    listUniqueAccounts,
+    getAssociationKey,
+    removeAssociationKey,
+    sendEvent,
+    initiateQrSession,
+    initializeDefaultScreen,
+    confirmSession,
+    denySession,
+    processLink
 };
