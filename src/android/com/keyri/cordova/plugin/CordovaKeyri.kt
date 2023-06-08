@@ -38,6 +38,8 @@ class CordovaKeyri : CordovaPlugin() {
                 initialize(appKey, publicApiKey, blockEmulatorDetection ?: true, callbackContext)
             }
 
+            "isInitialized" -> callbackContext.success(this::keyri.isInitialized)
+
             "easyKeyriAuth" -> {
                 val appKey = arguments?.getString(0)
                 val publicApiKey = arguments?.getString(1)

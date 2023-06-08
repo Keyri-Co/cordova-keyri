@@ -1,7 +1,16 @@
 var exec = require('cordova/exec');
 
+exports.isInitialized = false;
+
 exports.initialize = function (appKey, publicApiKey, blockEmulatorDetection, success, error) {
-    exec(success, error, 'CordovaKeyri', 'initialize', [appKey, publicApiKey, blockEmulatorDetection]);
+    exec(
+        function (result) {
+            self.isInitialized = result;
+
+            exec(success, error, 'CordovaKeyri', 'initialize', [appKey, publicApiKey, blockEmulatorDetection]);
+        },
+        error, 'CordovaKeyri', 'isInitialized', [appKey, publicApiKey, blockEmulatorDetection]
+    );
 };
 
 exports.easyKeyriAuth = function (appKey, publicApiKey, payload, publicUserId, success, error) {
