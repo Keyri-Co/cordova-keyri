@@ -42,7 +42,7 @@ class CordovaKeyri : CordovaPlugin() {
                 if (this::keyri.isInitialized) {
                     callbackContext.success()
                 } else {
-                    callbackContext.error("isInitialized, Keyri not initialized")
+                    callbackContext.error("isInitialized, Keyri is not initialized")
                 }
             }
 
