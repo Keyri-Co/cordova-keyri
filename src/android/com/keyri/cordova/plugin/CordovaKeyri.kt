@@ -40,7 +40,7 @@ class CordovaKeyri : CordovaPlugin() {
 
             "isInitialized" -> {
                 val result = JSONObject().apply {
-                    put(isInitialized, this::keyri.isInitialized)
+                    put("isInitialized", this@CordovaKeyri::keyri.isInitialized)
                 }
 
                 callbackContext.success(result)
