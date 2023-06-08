@@ -39,11 +39,11 @@ class CordovaKeyri : CordovaPlugin() {
             }
 
             "isInitialized" -> {
-                val result = JSONObject().apply {
-                    put("isInitialized", this@CordovaKeyri::keyri.isInitialized)
+                if (this::keyri.isInitialized) {
+                    callbackContext.success()
+                } else {
+                    callbackContext.error("isInitialized, Keyri not initialized")
                 }
-
-                callbackContext.success(result)
             }
 
             "easyKeyriAuth" -> {
