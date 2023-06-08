@@ -1,6 +1,7 @@
 package com.keyri.cordova.plugin
 
 import android.net.Uri
+import android.util.Log
 import android.app.Activity
 import android.content.Intent
 import androidx.fragment.app.FragmentActivity
@@ -29,6 +30,8 @@ class CordovaKeyri : CordovaPlugin() {
     private var easyKeyriAuthCallback: CallbackContext? = null
 
     override fun execute(action: String, arguments: JSONArray?, callbackContext: CallbackContext): Boolean {
+        Log.e("Executing native method", "$action, $arguments")
+
         when (action) {
             "initialize" -> {
                 val appKey = arguments?.getString(0)

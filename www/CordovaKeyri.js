@@ -2,6 +2,7 @@ var exec = require('cordova/exec');
 
 const asPromise = (action, args = []) =>
     new Promise((resolve, reject) => {
+        console.log('Executing interface method', action, args);
         exec(resolve, reject, 'CordovaKeyri', action, args);
     });
 
