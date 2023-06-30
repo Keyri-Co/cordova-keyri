@@ -6,13 +6,13 @@ const asPromise = (action, args = []) =>
         exec(resolve, reject, 'CordovaKeyri', action, args);
     });
 
-const initialize = (appKey, publicApiKey, blockEmulatorDetection) =>
-    asPromise('initialize', [appKey, publicApiKey, blockEmulatorDetection]);
+const initialize = (appKey, publicApiKey, serviceEncryptionKey, blockEmulatorDetection) =>
+    asPromise('initialize', [appKey, publicApiKey, serviceEncryptionKey, blockEmulatorDetection]);
 
 const isInitialized = () => asPromise('isInitialized');
 
-const easyKeyriAuth = (appKey, publicApiKey, payload, publicUserId) =>
-    asPromise('easyKeyriAuth', [appKey, publicApiKey, payload, publicUserId]);
+const easyKeyriAuth = (appKey, publicApiKey, serviceEncryptionKey, payload, publicUserId) =>
+    asPromise('easyKeyriAuth', [appKey, publicApiKey, serviceEncryptionKey, payload, publicUserId]);
 
 const generateAssociationKey = (publicUserId) => asPromise('generateAssociationKey', [publicUserId]);
 
@@ -27,8 +27,8 @@ const getAssociationKey = (publicUserId) => asPromise('getAssociationKey', [publ
 
 const removeAssociationKey = (publicUserId) => asPromise('removeAssociationKey', [publicUserId]);
 
-const sendEvent = (publicUserId, eventType, eventResult) =>
-    asPromise('sendEvent', [publicUserId, eventType, eventResult]);
+const sendEvent = (publicUserId, eventType, success) =>
+    asPromise('sendEvent', [publicUserId, eventType, success]);
 
 const initiateQrSession = (sessionId, publicUserId) =>
     asPromise('initiateQrSession', [sessionId, publicUserId]);
