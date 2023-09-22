@@ -1,17 +1,30 @@
 {
+  "version": "0.1.0",
   "name": "@keyri/cordova-keyri",
-  "version": "0.0.14",
-  "description": "Cordova Keyri SDK Plugin",
-  "main": "index.js",
+  "cordova_name": "Cordova Keyri Plugin",
+  "description": "Cordova Keyri SDK Plugin for QR login",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "yarn run build",
+    "build": "tsc"
   },
   "keywords": [
+    "authentication",
+    "qr-login",
+    "passwordless",
+    "multifactor-authentication",
+    "mobile-authentication",
     "ecosystem:cordova",
     "cordova-android",
     "cordova",
     "camera",
     "cordova-ios"
+  ],
+  "platforms": [
+    "android",
+    "ios"
   ],
   "repository": {
     "type": "git",
@@ -22,8 +35,8 @@
   "engines": {
     "cordovaDependencies": {
       "1.0.0": {
-        "cordova": ">=10.0.0",
-        "cordova-android": ">=9.0.0"
+        "cordova": ">=11.0.0",
+        "cordova-android": ">=11.0.0"
       }
     }
   },
@@ -33,5 +46,12 @@
       "ios",
       "android"
     ]
+  },
+  "bugs": {
+    "url": "https://github.com/Keyri-Co/cordova-keyri/issues"
+  },
+  "homepage": "https://keyri.com/",
+  "dependencies": {
+    "cordova-common": "^5.0.0"
   }
 }
