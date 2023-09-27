@@ -61,38 +61,6 @@ export interface KeyriGeoData {
     regionCode?: string;
 }
 
-export interface KeyriModule {
-    initialize: (data: InitializeKeyriOptions) => Promise<boolean>;
-
-    isInitialized: () => Promise<boolean>;
-
-    generateAssociationKey: (publicUserId?: string) => Promise<string>;
-
-    generateUserSignature: (publicUserId?: string, data?: string) => Promise<string>;
-
-    listAssociationKeys: () => Promise<string[]>;
-
-    listUniqueAccounts: () => Promise<string[]>;
-
-    getAssociationKey: (publicUserId?: string) => Promise<string>;
-
-    removeAssociationKey: (publicUserId: string) => Promise<boolean>;
-
-    sendEvent: (data: SendEventOptions) => Promise<KeyriFingerprintEventResponse>;
-
-    initiateQrSession: (sessionId: string, publicUserId?: string) => Promise<KeyriSession>;
-
-    initializeDefaultConfirmationScreen: (payload: string) => Promise<boolean>;
-
-    confirmSession: (payload: string, trustNewBrowser?: boolean) => Promise<boolean>;
-
-    denySession: (payload: string) => Promise<boolean>;
-
-    easyKeyriAuth: (publicUserId: string, payload: string) => Promise<boolean>;
-
-    processLink: (options: ProcessLinkOptions) => Promise<boolean>;
-}
-
 export interface ProcessLinkOptions {
     link: string;
     payload: string;

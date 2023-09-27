@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
         id="cordova-keyri"
-        version="0.1.0">
+        version="0.1.3">
 
     <name>CordovaKeyri</name>
     <description>Cordova Keyri SDK Plugin</description>
-
+    <keywords>authentication, qr-login, passwordless, multifactor-authentication, mobile-authentication, ecosystem:cordova, cordova-android, cordova, camera, cordova-ios</keywords>
     <license>MIT</license>
 
     <engines>
@@ -13,9 +13,11 @@
         <engine name="cordova-android" version=">=11.0.0"/>
     </engines>
 
-    <js-module src="www/CordovaKeyri.js" name="CordovaKeyri">
-        <clobbers target="cordova.plugins.CordovaKeyri"/>
+    <js-module src="dist/index.js" name="CordovaKeyriPlugin">
+        <clobbers target="CordovaKeyri"/>
     </js-module>
+
+    <js-module src="dist/types.js" name="types"/>
 
     <platform name="android">
         <framework src="com.keyri:keyrisdk:4.0.0"/>
@@ -27,7 +29,7 @@
 
         <config-file target="config.xml" parent="/*">
             <preference name="GradlePluginKotlinEnabled" value="true"/>
-            <preference name="GradlePluginKotlinVersion" value="1.6.0"/>
+            <preference name="GradlePluginKotlinVersion" value="1.8.21"/>
 
             <feature name="CordovaKeyri">
                 <param name="android-package" value="com.keyri.cordova.plugin.CordovaKeyri"/>
@@ -50,7 +52,7 @@
                 <source url="https://github.com/CocoaPods/Specs.git"/>
             </config>
             <pods use-frameworks="true">
-                <pod name="keyri-pod" spec="~> 4.1.2"/>
+                <pod name="keyri-pod" spec="~> 4.2.0"/>
             </pods>
         </podspec>
     </platform>
