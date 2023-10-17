@@ -97,7 +97,7 @@ import Keyri
 
     @objc(listAssociationKeys:)
     func listAssociationKeys(command: CDVInvokedUrlCommand) {
-        keyri?.listAssociactionKeys() { result in
+        keyri?.listAssociationKeys() { result in
             switch result {
             case .success(let list):
                 self.processResult(message: list ?? [:], command: command)
