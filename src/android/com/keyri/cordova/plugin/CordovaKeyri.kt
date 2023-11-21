@@ -100,6 +100,18 @@ class CordovaKeyri : CordovaPlugin() {
                 initiateQrSession(sessionId, publicUserId, callbackContext)
             }
 
+            "login" -> {
+                val publicUserId = arguments?.getString(0)
+
+                login(publicUserId, callbackContext)
+            }
+
+            "register" -> {
+                val publicUserId = arguments?.getString(0)
+
+                register(publicUserId, callbackContext)
+            }
+
             "initializeDefaultConfirmationScreen" -> {
                 val payload = arguments?.getString(1)
 
@@ -302,6 +314,26 @@ class CordovaKeyri : CordovaPlugin() {
                 }.onFailure {
                     callback.error("initiateQrSession, ${it.message}")
                 }
+            }
+        }
+    }
+
+    private fun login(publicUserId: String?, callback: CallbackContext) {
+        keyriCoroutineScope(callback::error).launch {
+            keyri.login(publicUserId).onSuccess { loginObject ->
+                callback.success(JSONObject(Gson().toJson(loginObject)))
+            }.onFailure {
+                callback.error("login, ${it.message}")
+            }
+        }
+    }
+
+    private fun register(publicUserId: String?, callback: CallbackContext) {
+        keyriCoroutineScope(callback::error).launch {
+            keyri.register(publicUserId).onSuccess { registerObject ->
+                callback.success(JSONObject(Gson().toJson(registerObject)))
+            }.onFailure {
+                callback.error("register, ${it.message}")
             }
         }
     }

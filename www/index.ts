@@ -1,7 +1,7 @@
 import type {
     ProcessLinkOptions,
     InitializeKeyriOptions,
-    SendEventOptions,
+    SendEventOptions, LoginObject, RegisterObject,
 } from './types';
 import {KeyriFingerprintEventResponse, KeyriSession} from "./types";
 
@@ -53,6 +53,14 @@ export class CordovaKeyriPlugin {
 
     initiateQrSession(sessionId: string, publicUserId?: string): Promise<KeyriSession> {
         return  asPromise('initiateQrSession', [sessionId, publicUserId]);
+    };
+
+    login(publicUserId?: string): Promise<LoginObject> {
+        return asPromise('login', [publicUserId]);
+    };
+
+    register(publicUserId?: string): Promise<RegisterObject> {
+        return asPromise('register', [publicUserId]);
     };
 
     initializeDefaultConfirmationScreen(payload: string): Promise<boolean> {
