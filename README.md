@@ -59,9 +59,9 @@ Keyri.getAssociationKey('kuliahin.andrew@gmail.com')
     });
 ```
 
-### Enable QR Auth
+### Keyri QR Auth
 
-QR Auth can be enabled with a single function call. This process handles scanning the code, generating the session info,
+QR Auth can be processed by Keyri with a single function call. This process handles scanning the code, generating the session info,
 displaying a confirmation screen to the user, and, if the user confirms, sending the encrypted payload you provide to
 the Keyri widget in your browser.
 

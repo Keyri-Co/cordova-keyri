@@ -208,7 +208,7 @@ import Keyri
         } ?? sendIsNotInitialized(methodName: "login", command: command)
     }
 
-    @objc(login:)
+    @objc(register:)
     func register(command: CDVInvokedUrlCommand) {
         let publicUserId = command.arguments[1] as? String
 

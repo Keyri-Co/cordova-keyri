@@ -31,11 +31,11 @@ export class CordovaKeyriPlugin {
         return asPromise('generateUserSignature', [publicUserId, data]);
     };
 
-    listAssociationKeys(): Promise<string[]> {
+    listAssociationKeys(): Promise<Map<string, string>> {
         return asPromise('listAssociationKeys');
     };
 
-    listUniqueAccounts(): Promise<string[]> {
+    listUniqueAccounts(): Promise<Map<string, string>> {
         return asPromise('listUniqueAccounts');
     };
 
@@ -93,5 +93,3 @@ if (!window.plugins) {
 if (!window.plugins.CordovaKeyri) {
     window.plugins.CordovaKeyri = CordovaKeyri;
 }
-
-export default CordovaKeyri;
