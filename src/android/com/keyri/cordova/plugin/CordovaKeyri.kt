@@ -7,7 +7,7 @@ import android.content.Intent
 import androidx.fragment.app.FragmentActivity
 import com.keyrico.keyrisdk.Keyri
 import com.keyrico.keyrisdk.entity.session.Session
-import com.keyrico.keyrisdk.sec.fingerprint.enums.EventType
+import com.keyrico.keyrisdk.sec.fraud.enums.EventType
 import com.google.gson.Gson
 import org.apache.cordova.CallbackContext
 import org.apache.cordova.CordovaPlugin
@@ -17,6 +17,7 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import com.keyrico.scanner.easyKeyriAuth
 
 class CordovaKeyri : CordovaPlugin() {
 
@@ -88,7 +89,7 @@ class CordovaKeyri : CordovaPlugin() {
             "sendEvent" -> {
                 val publicUserId = arguments?.getString(0)
                 val eventType = arguments?.getString(1)
-                val success = arguments?.getBoolean(2)
+                val success = arguments?.getBoolean(2) ?: true
 
                 sendEvent(publicUserId, eventType, success, callbackContext)
             }
@@ -98,6 +99,18 @@ class CordovaKeyri : CordovaPlugin() {
                 val publicUserId = arguments?.getString(1)
 
                 initiateQrSession(sessionId, publicUserId, callbackContext)
+            }
+
+            "login" -> {
+                val publicUserId = arguments?.getString(0)
+
+                login(publicUserId, callbackContext)
+            }
+
+            "register" -> {
+                val publicUserId = arguments?.getString(0)
+
+                register(publicUserId, callbackContext)
             }
 
             "initializeDefaultConfirmationScreen" -> {
@@ -116,7 +129,7 @@ class CordovaKeyri : CordovaPlugin() {
 
             "confirmSession" -> {
                 val payload = arguments?.getString(0)
-                val trustNewBrowser = arguments?.getString(1)
+                val trustNewBrowser = arguments?.getBoolean(1) ?: false
 
                 confirmSession(payload, trustNewBrowser, callbackContext)
             }
@@ -194,7 +207,7 @@ class CordovaKeyri : CordovaPlugin() {
     }
 
     private fun generateAssociationKey(publicUserId: String?, callback: CallbackContext) {
-        keyriCoroutineScope(callback::error).launch {
+        keyriCoroutineScope(callback).launch {
             val associationKey = publicUserId?.let {
                 keyri.generateAssociationKey(publicUserId).getOrThrow()
             } ?: keyri.generateAssociationKey().getOrThrow()
@@ -204,7 +217,7 @@ class CordovaKeyri : CordovaPlugin() {
     }
 
     private fun generateUserSignature(publicUserId: String?, data: String?, callback: CallbackContext) {
-        keyriCoroutineScope(callback::error).launch {
+        keyriCoroutineScope(callback).launch {
             if (data == null) {
                 callback.error("generateUserSignature, data must not be null")
             } else {
@@ -218,7 +231,7 @@ class CordovaKeyri : CordovaPlugin() {
     }
 
     private fun listAssociationKeys(callback: CallbackContext) {
-        keyriCoroutineScope(callback::error).launch {
+        keyriCoroutineScope(callback).launch {
             val keys = keyri.listAssociationKeys().getOrThrow()
             val resultArray = JSONArray()
 
@@ -235,7 +248,7 @@ class CordovaKeyri : CordovaPlugin() {
     }
 
     private fun listUniqueAccounts(callback: CallbackContext) {
-        keyriCoroutineScope(callback::error).launch {
+        keyriCoroutineScope(callback).launch {
             val keys = keyri.listUniqueAccounts().getOrThrow()
             val resultArray = JSONArray()
 
@@ -252,7 +265,7 @@ class CordovaKeyri : CordovaPlugin() {
     }
 
     private fun getAssociationKey(publicUserId: String?, callback: CallbackContext) {
-        keyriCoroutineScope(callback::error).launch {
+        keyriCoroutineScope(callback).launch {
             val associationKey = publicUserId?.let {
                 keyri.getAssociationKey(publicUserId).getOrThrow()
             } ?: keyri.getAssociationKey().getOrThrow()
@@ -262,7 +275,7 @@ class CordovaKeyri : CordovaPlugin() {
     }
 
     private fun removeAssociationKey(publicUserId: String?, callback: CallbackContext) {
-        keyriCoroutineScope(callback::error).launch {
+        keyriCoroutineScope(callback).launch {
             if (publicUserId == null) {
                 callback.error("removeAssociationKey, publicUserId must not be null")
             } else {
@@ -273,7 +286,7 @@ class CordovaKeyri : CordovaPlugin() {
     }
 
     private fun sendEvent(publicUserId: String?, eventType: String?, success: Boolean, callback: CallbackContext) {
-        keyriCoroutineScope(callback::error).launch {
+        keyriCoroutineScope(callback).launch {
             val type = EventType.values().firstOrNull { it.type == eventType }
 
             if (type == null) {
@@ -291,7 +304,7 @@ class CordovaKeyri : CordovaPlugin() {
     }
 
     private fun initiateQrSession(sessionId: String?, publicUserId: String?, callback: CallbackContext) {
-        keyriCoroutineScope(callback::error).launch {
+        keyriCoroutineScope(callback).launch {
             if (sessionId == null) {
                 callback.error("initiateQrSession, sessionId must not be null")
             } else {
@@ -306,16 +319,36 @@ class CordovaKeyri : CordovaPlugin() {
         }
     }
 
+    private fun login(publicUserId: String?, callback: CallbackContext) {
+        keyriCoroutineScope(callback).launch {
+            keyri.login(publicUserId).onSuccess { loginObject ->
+                callback.success(JSONObject(Gson().toJson(loginObject)))
+            }.onFailure {
+                callback.error("login, ${it.message}")
+            }
+        }
+    }
+
+    private fun register(publicUserId: String?, callback: CallbackContext) {
+        keyriCoroutineScope(callback).launch {
+            keyri.register(publicUserId).onSuccess { registerObject ->
+                callback.success(JSONObject(Gson().toJson(registerObject)))
+            }.onFailure {
+                callback.error("register, ${it.message}")
+            }
+        }
+    }
+
     private fun initializeDefaultConfirmationScreen(payload: String?, callback: CallbackContext) {
-        keyriCoroutineScope(callback::error).launch {
+        keyriCoroutineScope(callback).launch {
             if (activeSession == null) {
                 callback.error("initializeDefaultConfirmationScreen, can't find session")
             } else if (payload == null) {
                 callback.error("initializeDefaultConfirmationScreen, payload must not be null")
             } else {
                 (cordova.getActivity() as? FragmentActivity)?.supportFragmentManager?.let { fm ->
-                    keyri.initializeDefaultConfirmationScreen(fm, activeSession, payload).onSuccess { authResult ->
-                        callback.success(authResult)
+                    keyri.initializeDefaultConfirmationScreen(fm, requireNotNull(activeSession), payload).onSuccess { authResult ->
+                        callback.success()
                     }.onFailure {
                         callback.error("initializeDefaultConfirmationScreen, ${it.message}")
                     }
@@ -325,7 +358,7 @@ class CordovaKeyri : CordovaPlugin() {
     }
 
     private fun processLink(link: String?, payload: String?, publicUserId: String?, callback: CallbackContext) {
-        keyriCoroutineScope(callback::error).launch {
+        keyriCoroutineScope(callback).launch {
             if (link == null) {
                 callback.error("processLink, link must not be null")
             } else if (payload == null) {
@@ -333,7 +366,7 @@ class CordovaKeyri : CordovaPlugin() {
             } else {
                 (cordova.getActivity() as? FragmentActivity)?.supportFragmentManager?.let { fm ->
                     keyri.processLink(fm, Uri.parse(link), payload, publicUserId).onSuccess { authResult ->
-                        callback.success(authResult)
+                        callback.success()
                     }.onFailure {
                         callback.error("processLink, ${it.message}")
                     }
@@ -343,15 +376,15 @@ class CordovaKeyri : CordovaPlugin() {
     }
 
     private fun confirmSession(payload: String?, trustNewBrowser: Boolean, callback: CallbackContext) {
-        keyriCoroutineScope(callback::error).launch {
+        keyriCoroutineScope(callback).launch {
             if (activeSession == null) {
                 callback.error("confirmSession, can't find session")
             } else if (payload == null) {
                 callback.error("confirmSession, payload must not be null")
             } else {
-                activeSession.confirm(payload, requireNotNull(cordova.getActivity()), trustNewBrowser).onSuccess {
+                activeSession?.confirm(payload, requireNotNull(cordova.getActivity()), trustNewBrowser)?.onSuccess {
                     callback.success()
-                }.onFailure {
+                }?.onFailure {
                     callback.error("confirmSession, ${it.message}")
                 }
             }
@@ -359,24 +392,24 @@ class CordovaKeyri : CordovaPlugin() {
     }
 
     private fun denySession(payload: String?, callback: CallbackContext) {
-        keyriCoroutineScope(callback::error).launch {
+        keyriCoroutineScope(callback).launch {
             if (activeSession == null) {
                 callback.error("denySession, can't find session")
             } else if (payload == null) {
                 callback.error("denySession, payload must not be null")
             } else {
-                activeSession.deny(payload, requireNotNull(cordova.getActivity())).onSuccess {
+                activeSession?.deny(payload, requireNotNull(cordova.getActivity()))?.onSuccess {
                     callback.success()
-                }.onFailure {
+                }?.onFailure {
                     callback.error("denySession, ${it.message}")
                 }
             }
         }
     }
 
-    private fun keyriCoroutineScope(errorCallback: (e: Throwable) -> Unit): CoroutineScope {
+    private fun keyriCoroutineScope(callback: CallbackContext): CoroutineScope {
         val exceptionHandler = CoroutineExceptionHandler { _, e ->
-            errorCallback(e.message ?: "Error calling this method")
+            callback.error(e.message ?: "Error calling this method")
         }
 
         return CoroutineScope(Dispatchers.IO + exceptionHandler)

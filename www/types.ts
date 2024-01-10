@@ -10,6 +10,18 @@ export interface KeyriSession {
     mobileTemplateResponse?: KeyriMobileTemplateResponse;
 }
 
+export interface LoginObject {
+    timestampNonce: string,
+    signature: string,
+    publicKey: string,
+    userId: string,
+}
+
+export interface RegisterObject {
+    publicKey: string,
+    userId: string,
+}
+
 export interface KeyriFingerprintEventResponse {
     apiCiphertextSignature: string;
     publicEncryptionKey: string;

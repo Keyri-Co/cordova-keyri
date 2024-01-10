@@ -194,6 +194,34 @@ import Keyri
         } ?? sendIsNotInitialized(methodName: "initiateQrSession", command: command)
     }
 
+    @objc(login:)
+    func login(command: CDVInvokedUrlCommand) {
+        let publicUserId = command.arguments[1] as? String
+
+        keyri?.login(publicUserId: publicUserId) { result in
+            switch result {
+            case .success(let loginObject):
+                self.processResult(message: loginObject.asDictionary(), command: command)
+            case .failure(let error):
+                self.processError(error: error, command: command)
+            }
+        } ?? sendIsNotInitialized(methodName: "login", command: command)
+    }
+
+    @objc(register:)
+    func register(command: CDVInvokedUrlCommand) {
+        let publicUserId = command.arguments[1] as? String
+
+        keyri?.register(publicUserId: publicUserId) { result in
+            switch result {
+            case .success(let registerObject):
+                self.processResult(message: registerObject.asDictionary(), command: command)
+            case .failure(let error):
+                self.processError(error: error, command: command)
+            }
+        } ?? sendIsNotInitialized(methodName: "register", command: command)
+    }
+
     @objc(initializeDefaultConfirmationScreen:)
     func initializeDefaultConfirmationScreen(command: CDVInvokedUrlCommand) {
         guard let session = activeSession else {
