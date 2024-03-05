@@ -7,7 +7,7 @@ import android.content.Intent
 import androidx.fragment.app.FragmentActivity
 import com.keyrico.keyrisdk.Keyri
 import com.keyrico.keyrisdk.entity.session.Session
-import com.keyrico.keyrisdk.sec.fraud.enums.EventType
+import com.keyrico.keyrisdk.sec.fraud.event.EventType
 import com.google.gson.Gson
 import org.apache.cordova.CallbackContext
 import org.apache.cordova.CordovaPlugin
@@ -89,10 +89,13 @@ class CordovaKeyri : CordovaPlugin() {
             "sendEvent" -> {
                 val publicUserId = arguments?.getString(0)
                 val eventType = arguments?.getString(1)
-                val success = arguments?.getBoolean(2) ?: true
+                val eventMetadata = arguments?.getString(2)
+                val success = arguments?.getBoolean(3) ?: true
 
-                sendEvent(publicUserId, eventType, success, callbackContext)
+                sendEvent(publicUserId, eventType, eventMetadata, success, callbackContext)
             }
+
+            "createFingerprint" -> createFingerprint(callbackContext)
 
             "initiateQrSession" -> {
                 val sessionId = arguments?.getString(0)
@@ -199,7 +202,16 @@ class CordovaKeyri : CordovaPlugin() {
         } else {
             cordova.getActivity()?.let {
                 cordova.setActivityResultCallback(this)
-                easyKeyriAuth(it, AUTH_REQUEST_CODE, appKey, publicApiKey, serviceEncryptionKey, blockEmulatorDetection, payload, publicUserId)
+                easyKeyriAuth(
+                    it,
+                    AUTH_REQUEST_CODE,
+                    appKey,
+                    publicApiKey,
+                    serviceEncryptionKey,
+                    blockEmulatorDetection,
+                    payload,
+                    publicUserId
+                )
 
                 easyKeyriAuthCallback = callback
             } ?: callback.error("initializeDefaultScreen, can't get cordova.getActivity()")
@@ -285,20 +297,26 @@ class CordovaKeyri : CordovaPlugin() {
         }
     }
 
-    private fun sendEvent(publicUserId: String?, eventType: String?, success: Boolean, callback: CallbackContext) {
+    private fun sendEvent(publicUserId: String?, eventType: String?, eventMetadata: String?, success: Boolean, callback: CallbackContext) {
         keyriCoroutineScope(callback).launch {
-            val type = EventType.values().firstOrNull { it.type == eventType }
+            val jsonMetadata = eventMetadata?.let(::JSONObject)
+            val type = EventType.custom(eventType ?: "visits", jsonMetadata)
+            val userId = publicUserId ?: "ANON"
 
-            if (type == null) {
-                callback.error("sendEvent, eventType must not be null")
-            } else {
-                val userId = publicUserId ?: "ANON"
+            keyri.sendEvent(userId, type, success).onSuccess { fingerprintResponse ->
+                callback.success(JSONObject(Gson().toJson(fingerprintResponse)))
+            }.onFailure {
+                callback.error("sendEvent, ${it.message}")
+            }
+        }
+    }
 
-                keyri.sendEvent(userId, type, success).onSuccess {
-                    callback.success()
-                }.onFailure {
-                    callback.error("sendEvent, ${it.message}")
-                }
+    private fun createFingerprint(callback: CallbackContext) {
+        keyriCoroutineScope(callback).launch {
+            keyri.createFingerprint().onSuccess { fingerprintRequest ->
+                callback.success(JSONObject(Gson().toJson(fingerprintRequest)))
+            }.onFailure {
+                callback.error("createFingerprint, ${it.message}")
             }
         }
     }
@@ -347,9 +365,10 @@ class CordovaKeyri : CordovaPlugin() {
                 callback.error("initializeDefaultConfirmationScreen, payload must not be null")
             } else {
                 (cordova.getActivity() as? FragmentActivity)?.supportFragmentManager?.let { fm ->
-                    keyri.initializeDefaultConfirmationScreen(fm, requireNotNull(activeSession), payload).onSuccess { authResult ->
-                        callback.success()
-                    }.onFailure {
+                    keyri.initializeDefaultConfirmationScreen(fm, requireNotNull(activeSession), payload)
+                        .onSuccess { authResult ->
+                            callback.success()
+                        }.onFailure {
                         callback.error("initializeDefaultConfirmationScreen, ${it.message}")
                     }
                 } ?: callback.error("initializeDefaultConfirmationScreen, can't get supportFragmentManager")
