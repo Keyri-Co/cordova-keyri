@@ -162,9 +162,10 @@ import Keyri
                 return
             }
 
-        let success = command.arguments[2] as? String ?? "true"
+        let eventMetadata = command.arguments[2] as? String
+        let success = command.arguments[3] as? String ?? "true"
 
-        keyri?.sendEvent(publicUserId: publicUserId, eventType: EventType(rawValue: eventType) ?? .visits, success: Bool(success) ?? true) { result in
+        keyri?.sendEvent(publicUserId: publicUserId, eventType: EventType.custom(name: eventType, metadata: eventMetadata), success: Bool(success) ?? true) { result in
             switch result {
             case .success(let fingerprintResponse):
                 self.processResult(message: fingerprintResponse.asDictionary(), command: command)
@@ -172,6 +173,18 @@ import Keyri
                 self.processError(error: error, command: command)
             }
         } ?? sendIsNotInitialized(methodName: "sendEvent", command: command)
+    }
+
+    @objc(createFingerprint)
+    func createFingerprint(command: CDVInvokedUrlCommand) {
+        keyri?.createFingerprint() { result in
+            switch result {
+            case .success(let fingerprintRequest):
+                self.processResult(message: fingerprintRequest.asDictionary(), command: command)
+            case .failure(let error):
+                self.processError(error: error, command: command)
+            }
+        } ?? sendIsNotInitialized(methodName: "createFingerprint", command: command)
     }
 
     @objc(initiateQrSession:)

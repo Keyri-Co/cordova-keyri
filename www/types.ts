@@ -30,6 +30,13 @@ export interface KeyriFingerprintEventResponse {
     salt: string;
 }
 
+export interface KeyriFingerprintRequest {
+    clientEncryptionKey: string;
+    encryptedPayload: string;
+    salt: string;
+    iv: string;
+}
+
 export interface KeyriUserParameters {
     base64EncodedData?: string;
 }
@@ -92,15 +99,56 @@ export interface SendEventOptions {
     success: boolean;
 }
 
-export enum EventType {
-    Visits = 'visits',
-    Login = 'login',
-    Signup = 'signup',
-    AttachNewDevice = 'attach_new_device',
-    EmailChange = 'email_change',
-    ProfileUpdate = 'profile_update',
-    PasswordReset = 'password_reset',
-    Withdrawal = 'withdrawal',
-    Deposit = 'deposit',
-    Purchase = 'purchase',
+export class EventType {
+    name: string;
+    metadata?: object;
+
+    constructor(name: string, metadata?: object) {
+        this.name = name;
+        this.metadata = metadata;
+    }
+
+    static visits(metadata?: object): EventType {
+        return new EventType('visits', metadata);
+    }
+
+    static login(metadata?: object): EventType {
+        return new EventType('login', metadata);
+    }
+
+    static signup(metadata?: object): EventType {
+        return new EventType('signup', metadata);
+    }
+
+    static attachNewDevice(metadata?: object): EventType {
+        return new EventType('attach_new_device', metadata);
+    }
+
+    static emailChange(metadata?: object): EventType {
+        return new EventType('email_change', metadata);
+    }
+
+    static profileUpdate(metadata?: object): EventType {
+        return new EventType('profile_update', metadata);
+    }
+
+    static passwordReset(metadata?: object): EventType {
+        return new EventType('password_reset', metadata);
+    }
+
+    static withdrawal(metadata?: object): EventType {
+        return new EventType('withdrawal', metadata);
+    }
+
+    static deposit(metadata?: object): EventType {
+        return new EventType('deposit', metadata);
+    }
+
+    static purchase(metadata?: object): EventType {
+        return new EventType('purchase', metadata);
+    }
+
+    static custom(name: string, metadata?: object): EventType {
+        return new EventType(name, metadata);
+    }
 }
