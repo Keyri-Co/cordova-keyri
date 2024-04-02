@@ -20,9 +20,8 @@ import Keyri
         let appKey = arguments[0] as! String
         let publicApiKey = arguments[1] as? String
         let serviceEncryptionKey = arguments[2] as? String
-        let blockEmulatorDetection = arguments[3] as? Bool ?? true
 
-        keyri = KeyriInterface(appKey: appKey, publicApiKey: publicApiKey, serviceEncryptionKey: serviceEncryptionKey, blockEmulatorDetection: blockEmulatorDetection)
+        keyri = KeyriInterface(appKey: appKey, publicApiKey: publicApiKey, serviceEncryptionKey: serviceEncryptionKey, detectionConfig: KeyriDetectionsConfig())
 
         processResult(command: command)
     }
@@ -233,6 +232,13 @@ import Keyri
                 self.processError(error: error, command: command)
             }
         } ?? sendIsNotInitialized(methodName: "register", command: command)
+    }
+
+    @objc(getCorrectedTimestampSeconds:)
+    func getCorrectedTimestampSeconds(command: CDVInvokedUrlCommand) {
+        keyri?.getCorrectedTimestampSeconds() { timestamp in
+            self.processResult(message: timestamp, command: command)
+        } ?? sendIsNotInitialized(methodName: "getCorrectedTimestampSeconds", command: command)
     }
 
     @objc(initializeDefaultConfirmationScreen:)

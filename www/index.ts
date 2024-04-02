@@ -16,7 +16,7 @@ function asPromise<Type>(action: string, args: any[] = []): Promise<Type> {
 
 export class CordovaKeyriPlugin {
     initialize(options: InitializeKeyriOptions): Promise<boolean> {
-        return asPromise('initialize', [options.appKey, options.publicApiKey, options.serviceEncryptionKey, String(options.blockEmulatorDetection)]);
+        return asPromise('initialize', [options.appKey, options.publicApiKey, options.serviceEncryptionKey, options.detectionsConfig]);
     };
 
     isInitialized(): Promise<boolean> {
@@ -66,6 +66,10 @@ export class CordovaKeyriPlugin {
     register(publicUserId?: string): Promise<RegisterObject> {
         return asPromise('register', [publicUserId]);
     };
+
+    getCorrectedTimestampSeconds(): Promise<number> {
+        return asPromise('getCorrectedTimestampSeconds');
+    }
 
     initializeDefaultConfirmationScreen(payload: string): Promise<boolean> {
         return asPromise('initializeDefaultConfirmationScreen', [payload]);

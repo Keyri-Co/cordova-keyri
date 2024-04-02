@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
         id="cordova-keyri"
-        version="0.3.0">
+        version="0.4.0">
 
     <name>CordovaKeyri</name>
     <description>Cordova Keyri SDK Plugin</description>
@@ -22,8 +22,8 @@
     <js-module src="dist/types.js" name="types"/>
 
     <platform name="android">
-        <framework src="com.keyri:keyrisdk:4.2.4"/>
-        <framework src="com.keyri:scanner:4.2.4"/>
+        <framework src="com.keyri:keyrisdk:4.3.0-alpha05"/>
+        <framework src="com.keyri:scanner:4.3.0-alpha05"/>
         <framework src="com.google.code.gson:gson:2.10.1"/>
 
         <source-file src="src/android/com/keyri/cordova/plugin/CordovaKeyri.kt"
@@ -54,7 +54,7 @@
                 <source url="https://github.com/CocoaPods/Specs.git"/>
             </config>
             <pods use-frameworks="true">
-                <pod name="keyri-pod" spec="~> 4.5.1"/>
+                <pod name="keyri-pod" spec="~> 4.6.0-alpha05"/>
             </pods>
         </podspec>
     </platform>

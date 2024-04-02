@@ -90,7 +90,15 @@ export interface InitializeKeyriOptions {
     appKey: string;
     publicApiKey?: string;
     serviceEncryptionKey?: string;
+    detectionsConfig?: KeyriDetectionsConfig;
+}
+
+export interface KeyriDetectionsConfig {
     blockEmulatorDetection?: boolean;
+    blockRootDetection?: boolean;
+    blockDangerousAppsDetection?: boolean;
+    blockTamperDetection?: boolean;
+    blockSwizzleDetection?: boolean;
 }
 
 export interface SendEventOptions {

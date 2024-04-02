@@ -8,6 +8,7 @@ import androidx.fragment.app.FragmentActivity
 import com.keyrico.keyrisdk.Keyri
 import com.keyrico.keyrisdk.entity.session.Session
 import com.keyrico.keyrisdk.sec.fraud.event.EventType
+import com.keyrico.keyrisdk.config.KeyriDetectionsConfig
 import com.google.gson.Gson
 import org.apache.cordova.CallbackContext
 import org.apache.cordova.CordovaPlugin
@@ -27,9 +28,10 @@ class CordovaKeyri : CordovaPlugin() {
     private lateinit var appKey: String
     private var publicApiKey: String? = null
     private var serviceEncryptionKey: String? = null
-    private var blockEmulatorDetection: Boolean = true
 
     private var easyKeyriAuthCallback: CallbackContext? = null
+
+    private var detectionsConfig: KeyriDetectionsConfig = KeyriDetectionsConfig()
 
     override fun execute(action: String, arguments: JSONArray?, callbackContext: CallbackContext): Boolean {
         Log.e("Executing native method", "$action, $arguments")
@@ -39,9 +41,22 @@ class CordovaKeyri : CordovaPlugin() {
                 val appKey = arguments?.getString(0)
                 val publicApiKey = arguments?.getString(1)
                 val serviceEncryptionKey = arguments?.getString(2)
-                val blockEmulatorDetection = arguments?.getBoolean(3)
+                val detectionsConfigObject = arguments?.getJSONObject(3)
 
-                initialize(appKey, publicApiKey, serviceEncryptionKey, blockEmulatorDetection ?: true, callbackContext)
+                detectionsConfig = detectionsConfig.copy(
+                    blockEmulatorDetection = detectionsConfigObject.takeIf { it.has("blockEmulatorDetection") }
+                        ?.getBoolean("blockEmulatorDetection") ?: true,
+                    blockRootDetection = detectionsConfigObject.takeIf { it.has("blockRootDetection") }
+                        ?.getBoolean("blockRootDetection") ?: false,
+                    blockDangerousAppsDetection = detectionsConfigObject.takeIf { it.has("blockDangerousAppsDetection") }
+                        ?.getBoolean("blockDangerousAppsDetection") ?: false,
+                    blockTamperDetection = detectionsConfigObject.takeIf { it.has("blockTamperDetection") }
+                        ?.getBoolean("blockTamperDetection") ?: true,
+                    blockSwizzleDetection = detectionsConfigObject.takeIf { it.has("blockSwizzleDetection") }
+                        ?.getBoolean("blockSwizzleDetection") ?: false,
+                )
+
+                initialize(appKey, publicApiKey, serviceEncryptionKey, callbackContext)
             }
 
             "isInitialized" -> {
@@ -116,6 +131,8 @@ class CordovaKeyri : CordovaPlugin() {
                 register(publicUserId, callbackContext)
             }
 
+            "getCorrectedTimestampSeconds" -> getCorrectedTimestampSeconds(callbackContext)
+
             "initializeDefaultConfirmationScreen" -> {
                 val payload = arguments?.getString(1)
 
@@ -157,7 +174,6 @@ class CordovaKeyri : CordovaPlugin() {
         appKey: String?,
         publicApiKey: String?,
         serviceEncryptionKey: String?,
-        blockEmulatorDetection: Boolean,
         callback: CallbackContext
     ) {
         cordova.threadPool.execute {
@@ -170,9 +186,8 @@ class CordovaKeyri : CordovaPlugin() {
                             this.appKey = appKey
                             this.publicApiKey = publicApiKey
                             this.serviceEncryptionKey = serviceEncryptionKey
-                            this.blockEmulatorDetection = blockEmulatorDetection
 
-                            keyri = Keyri(it, appKey, publicApiKey, serviceEncryptionKey, blockEmulatorDetection)
+                            keyri = Keyri(it, appKey, publicApiKey, serviceEncryptionKey, detectionsConfig)
                         }
 
                         callback.success()
@@ -208,9 +223,9 @@ class CordovaKeyri : CordovaPlugin() {
                     appKey,
                     publicApiKey,
                     serviceEncryptionKey,
-                    blockEmulatorDetection,
                     payload,
-                    publicUserId
+                    publicUserId,
+                    detectionsConfig,
                 )
 
                 easyKeyriAuthCallback = callback
@@ -297,7 +312,13 @@ class CordovaKeyri : CordovaPlugin() {
         }
     }
 
-    private fun sendEvent(publicUserId: String?, eventType: String?, eventMetadata: String?, success: Boolean, callback: CallbackContext) {
+    private fun sendEvent(
+        publicUserId: String?,
+        eventType: String?,
+        eventMetadata: String?,
+        success: Boolean,
+        callback: CallbackContext
+    ) {
         keyriCoroutineScope(callback).launch {
             val jsonMetadata = eventMetadata?.let(::JSONObject)
             val type = EventType.custom(eventType ?: "visits", jsonMetadata)
@@ -357,6 +378,12 @@ class CordovaKeyri : CordovaPlugin() {
         }
     }
 
+    private fun getCorrectedTimestampSeconds(callback: CallbackContext) {
+        keyriCoroutineScope(callback).launch {
+            callback.success(keyri.getCorrectedTimestampSeconds())
+        }
+    }
+
     private fun initializeDefaultConfirmationScreen(payload: String?, callback: CallbackContext) {
         keyriCoroutineScope(callback).launch {
             if (activeSession == null) {
@@ -369,8 +396,8 @@ class CordovaKeyri : CordovaPlugin() {
                         .onSuccess { authResult ->
                             callback.success()
                         }.onFailure {
-                        callback.error("initializeDefaultConfirmationScreen, ${it.message}")
-                    }
+                            callback.error("initializeDefaultConfirmationScreen, ${it.message}")
+                        }
                 } ?: callback.error("initializeDefaultConfirmationScreen, can't get supportFragmentManager")
             }
         }
